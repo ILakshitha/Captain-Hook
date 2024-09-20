@@ -19,7 +19,10 @@ last_commit=$(git rev-parse HEAD)
 
 echo "Ahoy! Captain Hook's commit logger be ready to chart yer code voyage!"
 
-while true; do
+# Set a time limit (in seconds) - 4 minutes 30 seconds to allow for some buffer
+end_time=$((SECONDS + 270))
+
+while [ $SECONDS -lt $end_time ]; do
     # Check for new commits
     current_commit=$(git rev-parse HEAD)
     
@@ -45,6 +48,8 @@ while true; do
         last_commit=$current_commit
     fi
 
-    # Wait a bit before checking again
-    sleep 5
+    # Wait a bit before checking again (reduced from 5 to 1 second)
+    sleep 1
 done
+
+echo "Avast ye! The time limit be reached. Ending the script."
