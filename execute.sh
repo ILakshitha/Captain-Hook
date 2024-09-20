@@ -14,26 +14,37 @@ add_pirate_flair() {
     echo "$random_phrase $message"
 }
 
-# Get the total number of commits
-total_commits=$(git rev-list --all --count)
+# Get the initial HEAD commit hash
+last_commit=$(git rev-parse HEAD)
 
-# Log the last 10 commits (or all if less than 10)
-commits_to_log=$((total_commits < 10 ? total_commits : 10))
+echo "Ahoy! Captain Hook's commit logger be ready to chart yer code voyage!"
 
-echo "Yarr! Logging the last $commits_to_log commits to the treasure map!"
+while true; do
+    # Check for new commits
+    current_commit=$(git rev-parse HEAD)
+    
+    if [ "$current_commit" != "$last_commit" ]; then
+        # New commit found! Log it
+        commit_message=$(git log -1 --pretty=%B)
+        commit_author=$(git log -1 --pretty=%an)
+        commit_date=$(git log -1 --pretty=%ad --date=format:'%Y-%m-%d %H:%M:%S')
 
-git log -n "$commits_to_log" --reverse --pretty=format:"%H%n%s%n%an%n%ad" --date=format:"%Y-%m-%d %H:%M:%S" | while read -r commit_hash && read -r commit_message && read -r commit_author && read -r commit_date; do
-    # Add pirate flair to the commit message
-    pirate_message=$(add_pirate_flair "$commit_message")
+        # Add pirate flair to the commit message
+        pirate_message=$(add_pirate_flair "$commit_message")
 
-    # Log the commit details
-    echo "⚓ Commit: $commit_hash" >> "$LOGFILE"
-    echo "🏴‍☠️ Message: $pirate_message" >> "$LOGFILE"
-    echo "👤 Author: $commit_author" >> "$LOGFILE"
-    echo "🕰️ Date: $commit_date" >> "$LOGFILE"
-    echo "---" >> "$LOGFILE"
+        # Log the commit details
+        echo "⚓ Commit: $current_commit" >> "$LOGFILE"
+        echo "🏴‍☠️ Message: $pirate_message" >> "$LOGFILE"
+        echo "👤 Author: $commit_author" >> "$LOGFILE"
+        echo "🕰️ Date: $commit_date" >> "$LOGFILE"
+        echo "---" >> "$LOGFILE"
 
-    echo "Added commit $commit_hash to the log!"
+        echo "Yarr! New treasure be added to the map!"
+        
+        # Update last commit
+        last_commit=$current_commit
+    fi
+
+    # Wait a bit before checking again
+    sleep 5
 done
-
-echo "Ahoy! All commits be logged in the treasure map at $LOGFILE"
