@@ -21,7 +21,7 @@ while true; do
 
     # Wait for a new commit
     while [[ $current_commit == $(git rev-parse HEAD) ]]; do
-        sleep 10
+        sleep 5
     done
 
     # A new commit has been detected!
